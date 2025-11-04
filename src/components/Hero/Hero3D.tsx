@@ -13,6 +13,7 @@ import {
 import * as THREE from 'three';
 
 // Particle field for depth and atmosphere
+ 
 function ParticleField() {
   const count = 1000;
   const positions = useMemo(() => {
@@ -42,6 +43,7 @@ function ParticleField() {
           count={count}
           array={positions}
           itemSize={3}
+          args={[positions, 3]}
         />
       </bufferGeometry>
       <pointsMaterial
