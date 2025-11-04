@@ -18,7 +18,7 @@ function App() {
       <Contact />
       
       {/* Footer */}
-      <footer className="bg-dark-surface py-8 text-center text-gray-400 border-t border-gray-800">
+      <footer className="bg-[--color-dark-surface] py-8 text-center text-gray-400 border-t border-gray-800">
         <p>&copy; {new Date().getFullYear()} Saint Lucid. All rights reserved.</p>
         <p className="text-sm mt-2">Built with React, Vite, Tailwind CSS, and Framer Motion</p>
       </footer>

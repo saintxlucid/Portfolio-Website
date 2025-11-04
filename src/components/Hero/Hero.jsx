@@ -31,7 +31,7 @@ const Hero = () => {
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-dark-bg to-dark-bg" />
+      <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-[--color-dark-bg] to-[--color-dark-bg]" />
       
       {/* 3D Sigil - Lazy loaded */}
       <div className="absolute inset-0 flex items-center justify-center opacity-30">
@@ -73,7 +73,7 @@ const Hero = () => {
           </a>
           <a
             href="#contact"
-            className="px-8 py-3 bg-dark-surface hover:bg-dark-hover border border-purple-500/30 rounded-lg font-semibold transition-colors duration-300 focus-outline"
+            className="px-8 py-3 bg-[--color-dark-surface] hover:bg-[--color-dark-hover] border border-purple-500/30 rounded-lg font-semibold transition-colors duration-300 focus-outline"
           >
             Get in Touch
           </a>
