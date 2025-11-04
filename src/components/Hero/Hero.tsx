@@ -93,11 +93,15 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.8 }}
         >
-          <p className="text-xl md:text-3xl text-limestone/90 mb-4 font-light">
-            Media Specialist & Creative Technologist
+          <p className="text-xl md:text-3xl text-limestone/90 mb-2 font-light">
+            Founder & Chief Architect
           </p>
-          <p className="text-sm md:text-base text-limestone/60 mb-12 max-w-2xl mx-auto">
-            Building ASTRA — Sovereign AI architecture for the future
+          <p className="text-sm md:text-lg text-limestone/70 mb-4 font-medium tracking-wide">
+            AI Systems • Creative Technology • Strategic Innovation
+          </p>
+          <p className="text-sm md:text-base text-limestone/60 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Leading ASTRA OS—sovereign AI architecture redefining human-AI
+            collaboration
           </p>
         </motion.div>
 

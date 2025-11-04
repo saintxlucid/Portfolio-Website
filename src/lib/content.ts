@@ -3,12 +3,28 @@ import { Experience, Skill, Domain, SocialLink } from '@/types';
 export const personalInfo = {
   name: 'Saint Lucid',
   fullName: 'Karim Al-Sharif',
-  title: 'Media Specialist & Creative Technologist',
-  bio: 'Media Specialist & Creative Technologist building ASTRA — a sovereign AI assistant. Values evolution, precision, and beauty in structure.',
+  title: 'Founder & Chief Architect',
+  subtitle: 'AI Systems • Creative Technology • Strategic Innovation',
+  bio: 'Founder and Chief Architect specializing in AI systems architecture and creative technology. Leading ASTRA OS development—a sovereign AI assistant platform. Combining technical expertise in machine learning, full-stack development, and multimedia production with strategic business acumen. Proven track record in enterprise solutions, client relations, and cross-functional team leadership.',
+  tagline:
+    'Building the future of human-AI collaboration through elegant architecture and purposeful innovation.',
   email: {
     primary: 'saintxlucid@proton.me',
     secondary: 'karimkotb.alsharif@gmail.com',
   },
+  achievements: [
+    'Founded and architected ASTRA OS - sovereign AI assistant platform',
+    'Led enterprise SAP Pre-Sales initiatives with multi-million dollar impact',
+    'Delivered 50+ multimedia projects across music, film, and interactive media',
+    'Built bilingual AI/ML datasets advancing cross-linguistic research',
+  ],
+  expertise: [
+    'Strategic Technology Leadership',
+    'AI/ML Systems Architecture',
+    'Enterprise Solution Design',
+    'Multimedia Production & Direction',
+    'Cross-Cultural Business Development',
+  ],
 };
 
 export const domains: Domain[] = [

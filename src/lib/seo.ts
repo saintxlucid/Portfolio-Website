@@ -4,23 +4,33 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://saintlucid.com';
 
 export const defaultMetadata: Metadata = {
   title: {
-    default: 'Saint Lucid | Media Specialist & Creative Technologist',
+    default:
+      'Saint Lucid | Founder & Chief Architect | AI Systems • Creative Technology',
     template: '%s | Saint Lucid',
   },
   description:
-    'Media Specialist & Creative Technologist building ASTRA — a sovereign AI assistant. Specializing in AI systems, music production, film, and creative technology.',
+    'Founder & Chief Architect specializing in AI systems architecture and creative technology. Leading ASTRA OS development—sovereign AI platform redefining human-AI collaboration. Enterprise solutions • Strategic innovation • Multimedia production.',
   keywords: [
     'Saint Lucid',
     'Karim Al-Sharif',
-    'AI Systems',
-    'ASTRA',
+    'CEO',
+    'Founder',
+    'Chief Architect',
+    'AI Systems Architecture',
+    'ASTRA OS',
+    'Enterprise AI Solutions',
+    'Creative Technology Leadership',
+    'Strategic Innovation',
     'Music Production',
     'Sound Design',
-    'Film',
-    'Creative Technology',
+    'Film Production',
+    'SAP Pre-Sales',
+    'Machine Learning',
+    'Full Stack Development',
     'React',
     'Next.js',
     'Three.js',
+    'TypeScript',
   ],
   authors: [{ name: 'Karim Al-Sharif (Saint Lucid)' }],
   creator: 'Saint Lucid',
@@ -31,24 +41,26 @@ export const defaultMetadata: Metadata = {
     locale: 'en_US',
     alternateLocale: 'ar_EG',
     url: siteUrl,
-    siteName: 'Saint Lucid Portfolio',
-    title: 'Saint Lucid | Media Specialist & Creative Technologist',
+    siteName: 'Saint Lucid - Executive Portfolio',
+    title:
+      'Saint Lucid | Founder & Chief Architect | AI Systems • Creative Technology',
     description:
-      'Media Specialist & Creative Technologist building ASTRA — a sovereign AI assistant.',
+      'Leading ASTRA OS development—sovereign AI architecture redefining human-AI collaboration. Enterprise solutions, strategic innovation, and multimedia excellence.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Saint Lucid Portfolio',
+        alt: 'Saint Lucid - Founder & Chief Architect Portfolio',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Saint Lucid | Media Specialist & Creative Technologist',
+    title:
+      'Saint Lucid | Founder & Chief Architect | AI Systems • Creative Technology',
     description:
-      'Media Specialist & Creative Technologist building ASTRA — a sovereign AI assistant.',
+      'Leading ASTRA OS—sovereign AI architecture for human-AI collaboration. Enterprise solutions & strategic innovation.',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -70,14 +82,30 @@ export function generatePersonJsonLd() {
     '@type': 'Person',
     name: 'Karim Al-Sharif',
     alternateName: 'Saint Lucid',
-    jobTitle: 'Media Specialist & Creative Technologist',
+    jobTitle: 'Founder & Chief Architect',
     description:
-      'Media Specialist & Creative Technologist building ASTRA — a sovereign AI assistant.',
+      'Founder and Chief Architect specializing in AI systems architecture and creative technology. Leading ASTRA OS development—a sovereign AI platform redefining human-AI collaboration.',
     url: siteUrl,
     sameAs: [
       'https://github.com/saintxlucid',
       'https://www.linkedin.com/in/karimalsharif',
       'https://soundcloud.com/saintxlucid',
     ],
+    knowsAbout: [
+      'Artificial Intelligence',
+      'Machine Learning',
+      'AI Systems Architecture',
+      'Enterprise Software',
+      'Creative Technology',
+      'Music Production',
+      'Film Production',
+      'Full Stack Development',
+      'Strategic Innovation',
+      'Business Development',
+    ],
+    alumniOf: {
+      '@type': 'EducationalOrganization',
+      name: 'Arab Academy for Science, Technology and Maritime Transport',
+    },
   };
 }
