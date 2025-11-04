@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+:root {
+  /* Brand Colors */
+  --color-bg: #0b0b0e;
+  --color-limestone: #d7d3c8;
+  --color-amethyst: #b88cff;
+  --color-ice: #70e1f5;
+  --color-mint: #8ef5c3;
+  --color-gold: #e6c670;
+  --color-surface: #1a1a1e;
+  --color-border: #2a2a2e;
+}
+
+@theme {
+  /* Colors */
+  --color-bg: var(--color-bg);
+  --color-limestone: var(--color-limestone);
+  --color-amethyst: var(--color-amethyst);
+  --color-ice: var(--color-ice);
+  --color-mint: var(--color-mint);
+  --color-gold: var(--color-gold);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+  /* Animation */
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amethyst focus-visible:ring-offset-2 focus-visible:ring-offset-bg;
+}
+
+body {
+  @apply bg-bg text-limestone antialiased;
+  font-family: var(--font-sans);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

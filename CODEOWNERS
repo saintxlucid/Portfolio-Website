@@ -1,0 +1,17 @@
+# Code Ownership
+
+* @saintxlucid
+
+# Specific Directories
+/src/ @saintxlucid
+/.github/ @saintxlucid
+/tests/ @saintxlucid
+
+# Configuration Files
+*.json @saintxlucid
+*.yaml @saintxlucid
+*.yml @saintxlucid
+*.config.* @saintxlucid
+
+# Content
+/src/content/ @saintxlucid
