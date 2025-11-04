@@ -10,6 +10,12 @@ import {
   Trail,
   Stars,
 } from '@react-three/drei';
+import {
+  EffectComposer,
+  Bloom,
+  ChromaticAberration,
+  Vignette,
+} from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 // Particle field for depth and atmosphere
@@ -210,6 +216,18 @@ export default function Hero3D() {
 
         {/* Fog for depth */}
         <fog attach="fog" args={['#0b0b0e', 10, 30]} />
+
+        {/* Post-processing effects */}
+        <EffectComposer>
+          <Bloom
+            intensity={1.5}
+            luminanceThreshold={0.2}
+            luminanceSmoothing={0.9}
+            height={300}
+          />
+          <ChromaticAberration offset={[0.001, 0.001]} />
+          <Vignette offset={0.5} darkness={0.5} />
+        </EffectComposer>
       </Canvas>
     </div>
   );
