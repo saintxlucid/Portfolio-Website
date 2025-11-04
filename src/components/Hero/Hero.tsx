@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense, lazy } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Hero3D = lazy(() => import('./Hero3D'));
 
@@ -11,134 +11,162 @@ export default function Hero() {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const { scrollY } = useScroll();
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const scale = useTransform(scrollY, [0, 300], [1, 0.8]);
+
+  const letterVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.05,
+        duration: 0.8,
+        ease: [0.6, 0.01, 0.05, 0.95],
+      },
+    }),
+  };
+
+  const titleText = 'Saint Lucid';
+
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* 3D Background - Lazy Loaded */}
+      {/* Enhanced 3D Background - Lazy Loaded */}
       {enable3D && !prefersReducedMotion && (
         <Suspense
           fallback={
-            <div className="absolute inset-0 bg-gradient-to-b from-bg via-surface to-bg" />
+            <div className="absolute inset-0 bg-gradient-radial from-amethyst/20 via-bg to-bg" />
           }
         >
-          <Hero3D />
+          <motion.div style={{ opacity, scale }} className="absolute inset-0">
+            <Hero3D />
+          </motion.div>
         </Suspense>
       )}
 
-      {/* Fallback Gradient */}
+      {/* Fallback Gradient with enhanced effects */}
       {(!enable3D || prefersReducedMotion) && (
-        <div className="absolute inset-0 bg-gradient-radial from-amethyst/10 via-bg to-bg" />
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-radial from-amethyst/10 via-bg to-bg" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-ice/5 via-transparent to-transparent" />
+        </div>
       )}
 
+      {/* Grain texture overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.015] mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
       {/* Content */}
-      <div className="relative z-10 text-center px-4">
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+        {/* Animated title with letter-by-letter reveal */}
+        <motion.h1
+          className="text-7xl md:text-9xl font-bold mb-6 tracking-tight"
+          initial="hidden"
+          animate="visible"
+        >
+          {titleText.split('').map((char, i) => (
+            <motion.span
+              key={i}
+              custom={i}
+              variants={letterVariants}
+              className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-limestone via-amethyst to-ice"
+              style={{
+                backgroundSize: '200% 200%',
+                animation: 'gradient-shift 8s ease infinite',
+              }}
+            >
+              {char === ' ' ? '\u00A0' : char}
+            </motion.span>
+          ))}
+        </motion.h1>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
         >
-          <motion.div
-            className="inline-block mb-4"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          >
-            <div className="w-24 h-24 mx-auto mb-6 relative">
-              {/* SVG Sigil Fallback */}
-              <svg
-                viewBox="0 0 100 100"
-                className="w-full h-full"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  stroke="url(#gradient)"
-                  strokeWidth="2"
-                  className="animate-pulse"
-                />
-                <path
-                  d="M50 15 L80 70 L20 70 Z"
-                  stroke="url(#gradient)"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <defs>
-                  <linearGradient
-                    id="gradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="var(--color-amethyst)" />
-                    <stop offset="50%" stopColor="var(--color-ice)" />
-                    <stop offset="100%" stopColor="var(--color-mint)" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-          </motion.div>
-
-          <motion.h1
-            className="text-6xl md:text-8xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-limestone via-amethyst to-ice"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            Saint Lucid
-          </motion.h1>
-
-          <motion.p
-            className="text-xl md:text-2xl text-limestone/80 mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
+          <p className="text-xl md:text-3xl text-limestone/90 mb-4 font-light">
             Media Specialist & Creative Technologist
-          </motion.p>
+          </p>
+          <p className="text-sm md:text-base text-limestone/60 mb-12 max-w-2xl mx-auto">
+            Building ASTRA — Sovereign AI architecture for the future
+          </p>
+        </motion.div>
 
-          <motion.div
-            className="flex gap-4 justify-center flex-wrap"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+        {/* Enhanced CTA buttons */}
+        <motion.div
+          className="flex gap-6 justify-center flex-wrap"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.8 }}
+        >
+          <motion.a
+            href="#projects"
+            className="group relative px-8 py-4 bg-amethyst text-bg rounded-xl font-medium overflow-hidden transition-all duration-300"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <a
-              href="#projects"
-              className="px-6 py-3 bg-amethyst text-bg rounded-lg font-medium hover:bg-opacity-90 transition-all duration-200"
-            >
-              View Projects
-            </a>
-            <a
-              href="#contact"
-              className="px-6 py-3 bg-surface text-limestone border border-border rounded-lg font-medium hover:border-amethyst transition-all duration-200"
-            >
-              Get in Touch
-            </a>
-          </motion.div>
+            <span className="relative z-10">View Projects</span>
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-ice to-mint opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              initial={false}
+            />
+          </motion.a>
+          <motion.a
+            href="#contact"
+            className="group relative px-8 py-4 bg-surface/50 backdrop-blur-sm text-limestone border-2 border-border rounded-xl font-medium overflow-hidden transition-all duration-300 hover:border-amethyst"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <span className="relative z-10">Get in Touch</span>
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-amethyst/20 to-ice/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              initial={false}
+            />
+          </motion.a>
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Enhanced scroll indicator with animation */}
       <motion.div
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        initial={{ opacity: 0, y: -10 }}
+        className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.6 }}
+        transition={{ delay: 1.5, duration: 1 }}
       >
-        <div className="w-6 h-10 border-2 border-limestone/30 rounded-full flex justify-center">
+        <motion.div
+          className="w-8 h-14 border-2 border-limestone/30 rounded-full flex justify-center p-2"
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
           <motion.div
-            className="w-1.5 h-1.5 bg-limestone rounded-full mt-2"
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            className="w-2 h-2 bg-limestone rounded-full"
+            animate={{ y: [0, 20, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
           />
-        </div>
+        </motion.div>
+        <p className="text-xs text-limestone/40 mt-2 text-center">Scroll</p>
       </motion.div>
+
+      <style jsx>{`
+        @keyframes gradient-shift {
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+      `}</style>
     </section>
   );
 }
