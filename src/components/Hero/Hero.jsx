@@ -29,13 +29,13 @@ const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: 'var(--color-dark-bg)' }}>
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-[--color-dark-bg] to-[--color-dark-bg]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-transparent to-transparent" />
       
       {/* 3D Sigil - Lazy loaded */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-30">
-        <Suspense fallback={<div className="w-96 h-96 bg-purple-500/5 rounded-full animate-pulse" />}>
+      <div className="absolute inset-0 flex items-center justify-center opacity-40">
+        <Suspense fallback={<div className="w-96 h-96 bg-purple-500/10 rounded-full animate-pulse" />}>
           <AnimatedSigil />
         </Suspense>
       </div>
@@ -73,7 +73,10 @@ const Hero = () => {
           </a>
           <a
             href="#contact"
-            className="px-8 py-3 bg-[--color-dark-surface] hover:bg-[--color-dark-hover] border border-purple-500/30 rounded-lg font-semibold transition-colors duration-300 focus-outline"
+            className="px-8 py-3 border border-purple-500/30 rounded-lg font-semibold transition-colors duration-300 focus-outline"
+            style={{ backgroundColor: 'var(--color-dark-surface)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-dark-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-dark-surface)'}
           >
             Get in Touch
           </a>

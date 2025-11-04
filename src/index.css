@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
-@theme {
+:root {
   --color-dark-bg: #0a0a0a;
   --color-dark-surface: #1a1a1a;
   --color-dark-hover: #2a2a2a;
-
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --color-purple-primary: #9333ea;
+  --color-purple-light: #a855f7;
+  --color-pink-accent: #ec4899;
 }
 
 @keyframes float {
@@ -27,7 +27,10 @@
   }
 
   body {
-    @apply bg-[--color-dark-bg] text-white m-0 overflow-x-hidden;
+    background-color: var(--color-dark-bg);
+    color: white;
+    margin: 0;
+    overflow-x: hidden;
   }
 
   * {
@@ -50,7 +53,8 @@
 @layer components {
   /* Focus states for accessibility */
   .focus-outline {
-    @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-[--color-dark-bg];
+    @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
+    ring-offset-color: var(--color-dark-bg);
   }
 
   /* Section container */
@@ -60,6 +64,11 @@
 
   /* Card styles */
   .card {
-    @apply bg-[--color-dark-surface] rounded-lg p-6 hover:bg-[--color-dark-hover] transition-colors duration-300;
+    background-color: var(--color-dark-surface);
+    @apply rounded-lg p-6 transition-colors duration-300;
+  }
+  
+  .card:hover {
+    background-color: var(--color-dark-hover);
   }
 }

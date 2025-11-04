@@ -98,7 +98,7 @@ const Skills = () => {
                       <span className="text-gray-300">{skill.name}</span>
                       <span className="text-purple-400">{skill.level}%</span>
                     </div>
-                    <div className="h-2 bg-dark-bg rounded-full overflow-hidden">
+                    <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(10, 10, 10, 0.5)' }}>
                       <motion.div
                         className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
                         initial={{ width: 0 }}
