@@ -1,0 +1,3861 @@
+# SAINTXVERSE
+
+## Master Product, Experience, Design, Media, Data & Technical Architecture Blueprint
+
+**System:** SaintxVerse  
+**Identities:** Karim Al-Sharif × Saint Lucid  
+**Architecture principle:** One universe. One canonical graph. Multiple projections.  
+**Experience principle:** Public simplicity, hidden depth.  
+**Technical principle:** The Verse should be technically real as a graph, not merely a collection of pages.
+
+---
+
+# 0. EXECUTIVE DEFINITION
+
+SaintxVerse is not a traditional portfolio.
+
+It is a personal digital universe and media operating system representing two expressions of the same person:
+
+**Karim Al-Sharif** represents the professional, technical and public-facing identity.
+
+**Saint Lucid** represents the artistic, musical, cinematic, experimental and exploratory identity.
+
+They share one canonical content system.
+
+They do not have separate databases.
+
+They do not have separate CMS installations.
+
+They do not require duplicated projects.
+
+Instead:
+
+```text
+CANONICAL REALITY
+        │
+        ├──────────────┐
+        │              │
+        ▼              ▼
+ KARIM PROJECTION   SAINT PROJECTION
+ professional       artistic
+ contextual         mythological
+ technical          experiential
+ recruiter-facing   audience-facing
+```
+
+A project such as ASTRA PRIME therefore exists once.
+
+Its Karim projection may explain:
+
+```text
+architecture
+problem
+technical decisions
+stack
+implementation
+results
+lessons
+```
+
+Its Saint projection may explain:
+
+```text
+origin
+philosophy
+visual identity
+experiments
+mythology
+artifacts
+relationship to other works
+```
+
+The object is canonical.
+
+The interpretation changes.
+
+---
+
+# 1. LOCKED ARCHITECTURAL PRINCIPLES
+
+These should be considered foundational decisions unless a future technical constraint gives a strong reason to revisit them.
+
+| Area | Decision |
+|---|---|
+| Product | One SaintxVerse platform |
+| Content | One canonical content graph |
+| Personas | Karim + Saint projections |
+| Identity | Independent application state |
+| Appearance | Independent light/dark/system state |
+| Language | EN + AR initially |
+| Direction | LTR + RTL |
+| Discovery | Independent unlock/progression state |
+| Database | PostgreSQL |
+| Managed DB | Supabase baseline |
+| Search | PostgreSQL FTS + pgvector + RRF |
+| Assets | R2/object storage |
+| Premium video | Mux |
+| Native player | SaintxVerse Studio Player |
+| External media | Provider adapters |
+| Games | Phaser |
+| App framework | Next.js App Router |
+| UI | React + TypeScript |
+| Styling | Tailwind CSS v4 + semantic CSS tokens |
+| Client state | Small purpose-specific Zustand stores |
+| CMS | SaintxVerse Studio admin over canonical graph |
+| Deployment | Vercel baseline + Cloudflare media/storage edge |
+| Accessibility | WCAG 2.2 AA target |
+| Search security | Public projection/search corpus only |
+| Hidden content | Hidden never means private |
+| Audio | Never autoplay audible media without user intent |
+| Motion | Progressive enhancement, not dependency |
+
+The recommended frontend remains [Next.js](https://nextjs.org/docs?utm_source=chatgpt.com) with Server Components as the default and Client Components introduced only where browser state or interaction requires them. This keeps much of the application outside the client JavaScript bundle.
+
+---
+
+# 2. THE FOUR SAINTXVERSE STATE AXES
+
+The system must never collapse identity, visual theme, language and discovery into a single "mode."
+
+They are separate axes.
+
+```ts
+type Identity = 'karim' | 'saint';
+
+type Appearance =
+  | 'light'
+  | 'dark'
+  | 'system';
+
+type Locale =
+  | 'en'
+  | 'ar';
+
+interface VerseState {
+  identity: Identity;
+  appearance: Appearance;
+  locale: Locale;
+
+  reducedMotion: boolean;
+  reducedEffects: boolean;
+
+  discovery: DiscoveryState;
+}
+```
+
+This allows:
+
+```text
+Karim + Light + English
+Karim + Dark + Arabic
+
+Saint + Dark + English
+Saint + Light + Arabic
+```
+
+without architectural hacks.
+
+## Default presentation
+
+```text
+Karim → light
+Saint → dark
+```
+
+These are defaults, not restrictions.
+
+A visitor may choose otherwise.
+
+---
+
+# 3. STATE OWNERSHIP
+
+Not every state belongs in one global store.
+
+That would eventually produce a giant state container coupling unrelated systems.
+
+Use separate domains.
+
+```text
+SERVER / URL STATE
+├── locale
+├── route
+├── entity slug
+├── filters
+└── shareable search state
+
+PREFERENCE STATE
+├── identity
+├── appearance
+├── reduced effects override
+└── optional player preferences
+
+PLAYER STATE
+├── queue
+├── active media
+├── provider
+├── playback state
+├── volume
+└── repeat/shuffle
+
+DISCOVERY STATE
+├── signals
+├── glyphs
+├── achievements
+├── unlocked experiences
+└── local progression
+
+EPHEMERAL UI STATE
+├── dialogs
+├── menus
+├── hover
+├── drawers
+└── transient interactions
+```
+
+Use Zustand where persistence across component boundaries genuinely helps.
+
+Do not turn Zustand into the database of the frontend.
+
+---
+
+# 4. SAINTXVERSE INFORMATION ARCHITECTURE
+
+```text
+SAINTXVERSE
+│
+├── /
+│   └── X Gateway
+│
+├── /karim
+│   ├── about
+│   ├── experience
+│   ├── projects
+│   ├── projects/[slug]
+│   ├── case-studies
+│   ├── case-studies/[slug]
+│   ├── cv
+│   ├── story
+│   └── contact
+│
+├── /saint
+│   ├── music
+│   │   ├── releases
+│   │   ├── releases/[slug]
+│   │   └── tracks/[slug]
+│   │
+│   ├── cinema
+│   │   └── [slug]
+│   │
+│   ├── visuals
+│   │   └── [slug]
+│   │
+│   ├── arcade
+│   │   ├── lucid-drift
+│   │   ├── signal-break
+│   │   └── ascension
+│   │
+│   ├── lab
+│   │   └── [experiment]
+│   │
+│   ├── tools
+│   │   └── [tool]
+│   │
+│   ├── about
+│   └── contact
+│
+├── /search
+│
+├── /terminal
+│
+├── /void
+│
+├── /333
+│
+└── /studio/*
+    └── authenticated administration
+```
+
+Localized routing can expose:
+
+```text
+/en/...
+/ar/...
+```
+
+Canonical and hreflang metadata must reflect those URLs.
+
+---
+
+# 5. THE X GATEWAY
+
+The X is the symbolic and functional center of SaintxVerse.
+
+It represents:
+
+```text
+Karim × Saint
+Artist × Engineer
+Human × Machine
+Sound × Image
+Professional × Experimental
+Structure × Chaos
+Reality × Mythology
+```
+
+Primary control:
+
+```text
+KARIM ◀──── X ────▶ SAINT
+```
+
+A normal interaction switches identity.
+
+A deliberate extended interaction can become part of the discovery system.
+
+For example:
+
+```text
+click X
+→ identity switch
+
+hold X
+→ progression timer
+
+hold 3.33 seconds
++ required signals discovered
+→ unlock hidden transition
+
+drag X
+→ optional visual response
+
+keyboard shortcut
+→ accessible identity switch
+```
+
+The normal interaction must remain obvious and accessible.
+
+Secrets cannot interfere with it.
+
+---
+
+# 6. IDENTITY TRANSITION ENGINE
+
+Use the browser View Transition API as progressive enhancement rather than building a fragile screenshot/WebGL replacement for the DOM.
+
+`document.startViewTransition()` is now broadly available on current browser generations, but older browsers still require a normal state-change fallback.
+
+Conceptually:
+
+```ts
+function switchIdentity(next: Identity) {
+  const update = () => {
+    document.documentElement.dataset.identity = next;
+    setIdentity(next);
+  };
+
+  if (
+    !document.startViewTransition ||
+    prefersReducedMotion()
+  ) {
+    update();
+    return;
+  }
+
+  document.startViewTransition(update);
+}
+```
+
+Target:
+
+```text
+~400–700 ms
+```
+
+for the complete identity choreography.
+
+Not every element should animate.
+
+The X, hero typography, key imagery, navigation and background atmosphere may transform.
+
+Body copy should generally remain stable.
+
+Reduced-motion mode should become an immediate or subtle crossfade.
+
+The goal is:
+
+**continuity without spectacle fatigue.**
+
+---
+
+# 7. DESIGN TOKEN ENGINE
+
+Use [Tailwind CSS](https://tailwindcss.com/docs/theme?trk=article-ssr-frontend-pulse_x-social-details_comments-action_comment-text&utm_source=chatgpt.com) v4 as a utility compiler over a semantic CSS token architecture.
+
+Tailwind v4's `@theme` variables generate utilities and CSS variables.
+
+The important separation is:
+
+```text
+PRIMITIVE TOKENS
+↓
+SEMANTIC TOKENS
+↓
+IDENTITY RESOLUTION
+↓
+APPEARANCE RESOLUTION
+↓
+COMPONENT TOKENS
+```
+
+Example:
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-surface: var(--sx-surface);
+  --color-surface-elevated: var(--sx-surface-elevated);
+  --color-text-primary: var(--sx-text-primary);
+  --color-text-secondary: var(--sx-text-secondary);
+  --color-accent: var(--sx-accent);
+  --color-border: var(--sx-border);
+
+  --font-display: var(--sx-font-display);
+  --font-body: var(--sx-font-body);
+}
+```
+
+Then:
+
+```css
+:root[data-identity="karim"] {
+  --sx-font-display: var(--font-karim-display);
+  --sx-font-body: var(--font-karim-body);
+  --sx-motion-factor: .7;
+}
+
+:root[data-identity="saint"] {
+  --sx-font-display: var(--font-saint-display);
+  --sx-font-body: var(--font-saint-body);
+  --sx-motion-factor: 1;
+}
+```
+
+Appearance resolves independently.
+
+```css
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --sx-surface: #ffffff;
+  --sx-surface-elevated: #f6f7f9;
+  --sx-text-primary: #101114;
+  --sx-text-secondary: #60646c;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --sx-surface: #050507;
+  --sx-surface-elevated: #0c0c11;
+  --sx-text-primary: #f7f7f8;
+  --sx-text-secondary: #a1a1aa;
+}
+```
+
+Then identity adds character.
+
+```css
+:root[data-identity="karim"] {
+  --sx-accent: #2563eb;
+}
+
+:root[data-identity="saint"] {
+  --sx-accent: #d946ef;
+  --sx-glow: rgba(217, 70, 239, .35);
+}
+```
+
+CSS variable changes avoid React component remounting, but they do **not** mean rendering is free. Changes may cause style recalculation, painting or compositing.
+
+That distinction matters.
+
+---
+
+# 8. VISUAL LANGUAGES
+
+## Karim
+
+Karim should feel:
+
+```text
+editorial
+intelligent
+quiet
+precise
+bright
+human
+credible
+premium
+```
+
+Avoid making the professional side look like a generic SaaS landing page.
+
+Use:
+
+- generous whitespace
+- strong typographic hierarchy
+- subtle grids
+- excellent portrait imagery
+- technical diagrams where relevant
+- restrained blue accent
+- almost no decorative glow
+- subtle motion
+- dense information only when requested
+
+The opening narrative:
+
+```text
+Who I am
+↓
+What I have done
+↓
+What I can do
+↓
+What I have built
+↓
+How I think
+↓
+Where I am going
+```
+
+## Saint
+
+Saint should feel:
+
+```text
+cinematic
+nocturnal
+spatial
+mysterious
+musical
+alive
+experimental
+high-production
+```
+
+But not:
+
+```text
+random neon
+constant blur
+cheap glassmorphism
+cyberpunk template
+overanimated portfolio
+```
+
+Darkness should come from art direction, not simply `background: black`.
+
+---
+
+# 9. COMPONENT SYSTEM
+
+The application should have one semantic component library.
+
+Examples:
+
+```text
+Action
+Button
+IconButton
+Link
+Badge
+Avatar
+Card
+Surface
+Stack
+Cluster
+Grid
+Container
+Section
+Hero
+Navigation
+Breadcrumb
+Tabs
+Disclosure
+Accordion
+Dialog
+Drawer
+Popover
+Tooltip
+Dropdown
+ContextMenu
+CommandMenu
+SearchInput
+TextField
+Textarea
+Select
+Combobox
+Checkbox
+RadioGroup
+Switch
+Slider
+RangeSlider
+FormField
+FormError
+Toast
+Alert
+Progress
+Skeleton
+EmptyState
+ErrorState
+OfflineState
+Pagination
+Table
+Timeline
+CodeBlock
+ArchitectureDiagram
+Gallery
+Lightbox
+MediaCard
+ReleaseCard
+TrackRow
+VideoCard
+ArtworkCard
+ProjectCard
+CaseStudy
+PlayerControls
+Waveform
+Spectrum
+Queue
+LyricsPanel
+CreditsPanel
+GameLauncher
+Achievement
+Signal
+Glyph
+IdentitySwitch
+ThemeSwitch
+LocaleSwitch
+```
+
+A component's semantics stay constant.
+
+Its projection changes visually through tokens and content.
+
+---
+
+# 10. RESPONSIVE SYSTEM
+
+Design mobile-first.
+
+Recommended conceptual breakpoints:
+
+```text
+compact
+medium
+wide
+cinematic
+```
+
+Do not let breakpoint numbers become product logic.
+
+Major requirements:
+
+```text
+320px usable minimum
+mobile navigation fully functional
+player functional one-handed
+RTL tested independently
+games offer orientation guidance
+tables reflow gracefully
+command palette becomes search sheet
+cinematic visuals scale down or disable
+```
+
+Touch controls should generally target at least 44×44 CSS px even though WCAG 2.2 AA's minimum target criterion is 24×24 with defined exceptions.
+
+---
+
+# 11. CANONICAL DATA GRAPH
+
+The database is the backbone of the Verse.
+
+Recommended baseline:
+
+[Supabase](https://supabase.com?utm_source=chatgpt.com) managed PostgreSQL.
+
+Core topology:
+
+```text
+ENTITY
+│
+├── PROJECTIONS
+│   ├── Karim
+│   └── Saint
+│
+├── TRANSLATIONS
+│   ├── English
+│   └── Arabic
+│
+├── RELATIONS
+│
+├── MEDIA
+│
+├── CREDITS
+│
+├── TAXONOMY
+│
+├── TIMELINE EVENTS
+│
+├── SEARCH DOCUMENTS
+│
+├── DISCOVERY LINKS
+│
+└── ANALYTICS REFERENCES
+```
+
+---
+
+# 12. CORE ENTITY MODEL
+
+```sql
+create type sx_identity as enum (
+  'karim',
+  'saint'
+);
+
+create type publication_state as enum (
+  'draft',
+  'scheduled',
+  'unlisted',
+  'public',
+  'archived'
+);
+
+create table entities (
+  id uuid primary key default gen_random_uuid(),
+
+  slug text unique not null,
+  entity_type text not null,
+
+  canonical_title text not null,
+  canonical_summary text,
+
+  publication publication_state
+    not null default 'draft',
+
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+```
+
+`entity_type` may include:
+
+```text
+person
+organization
+project
+case_study
+experience
+education
+certification
+skill
+release
+track
+video
+artwork
+gallery
+game
+experiment
+tool
+article
+page
+technology
+event
+signal
+discovery
+```
+
+Do not make every entity-specific field a nullable column in this table.
+
+---
+
+# 13. IDENTITY PROJECTIONS
+
+```sql
+create table entity_projections (
+  id uuid primary key default gen_random_uuid(),
+
+  entity_id uuid not null
+    references entities(id)
+    on delete cascade,
+
+  identity sx_identity not null,
+
+  title text,
+  eyebrow text,
+  summary text,
+
+  body jsonb not null default '{}'::jsonb,
+
+  seo_title text,
+  seo_description text,
+
+  featured boolean not null default false,
+  sort_order integer,
+
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+
+  unique(entity_id, identity)
+);
+```
+
+The projection determines presentation.
+
+It does not duplicate canonical identity.
+
+---
+
+# 14. LOCALIZATION
+
+Do not put locale inside arbitrary JSON.
+
+Create localized projection content.
+
+```sql
+create table projection_localizations (
+  id uuid primary key default gen_random_uuid(),
+
+  projection_id uuid not null
+    references entity_projections(id)
+    on delete cascade,
+
+  locale text not null,
+
+  title text,
+  eyebrow text,
+  summary text,
+  body jsonb not null default '{}'::jsonb,
+
+  seo_title text,
+  seo_description text,
+
+  unique(projection_id, locale)
+);
+```
+
+Initial locales:
+
+```text
+en
+ar
+```
+
+Store direction at locale configuration level:
+
+```ts
+const locales = {
+  en: { direction: 'ltr' },
+  ar: { direction: 'rtl' }
+};
+```
+
+Set:
+
+```html
+<html lang="ar" dir="rtl">
+```
+
+Arabic is not an English layout with text reversed.
+
+Navigation, directional icons, breadcrumb arrows, carousel directions, text alignment and spatial relationships need RTL review.
+
+---
+
+# 15. GRAPH RELATIONSHIPS
+
+```sql
+create table entity_relations (
+  source_entity_id uuid not null
+    references entities(id)
+    on delete cascade,
+
+  target_entity_id uuid not null
+    references entities(id)
+    on delete cascade,
+
+  relation_type text not null,
+
+  metadata jsonb not null default '{}'::jsonb,
+
+  primary key (
+    source_entity_id,
+    target_entity_id,
+    relation_type
+  )
+);
+```
+
+Relations include:
+
+```text
+TRACK
+  part_of → RELEASE
+
+VIDEO
+  visualizes → TRACK
+
+ARTWORK
+  artwork_for → RELEASE
+
+PERSON
+  collaborated_on → TRACK
+
+PROJECT
+  uses → TECHNOLOGY
+
+PROJECT
+  evolved_into → PROJECT
+
+CASE_STUDY
+  documents → PROJECT
+
+GAME
+  belongs_to → ARCADE
+
+DISCOVERY
+  unlocks → ENTITY
+
+SIGNAL
+  required_for → DISCOVERY
+```
+
+This is what makes the Verse a real graph.
+
+---
+
+# 16. MEDIA DOMAIN MODEL
+
+Do not store all media in one generic JSON blob.
+
+Use several layers.
+
+```text
+MEDIA ASSET
+    │
+    ├── SOURCE
+    ├── RENDITIONS
+    ├── TRACKS
+    ├── CAPTIONS
+    ├── ANALYSIS
+    ├── RIGHTS
+    └── PROVIDER REFERENCES
+```
+
+Example:
+
+```sql
+create table media_assets (
+  id uuid primary key default gen_random_uuid(),
+
+  entity_id uuid references entities(id),
+
+  media_kind text not null,
+  role text,
+
+  duration_ms bigint,
+  width integer,
+  height integer,
+
+  mime_type text,
+
+  storage_provider text,
+  storage_key text,
+
+  checksum_sha256 text,
+
+  rights_status text,
+  territory jsonb,
+
+  created_at timestamptz not null default now()
+);
+```
+
+Additional tables:
+
+```text
+media_renditions
+media_captions
+media_chapters
+media_waveforms
+media_analysis_profiles
+media_provider_links
+media_rights
+media_ingest_jobs
+```
+
+---
+
+# 17. OBJECT STORAGE
+
+Use [Cloudflare R2](https://developers.cloudflare.com/r2/?utm_source=chatgpt.com) for:
+
+```text
+source artwork
+optimized artwork
+audio masters
+audio renditions
+downloadables
+project files
+game assets
+3D assets
+analysis sidecars
+waveform data
+private source material
+```
+
+R2 currently charges for storage and operations but does not charge Internet egress bandwidth. Other metered services connected to R2 may still charge their own fees.
+
+Therefore the correct statement is:
+
+**R2 has zero R2 Internet egress charges.**
+
+Not:
+
+**all media delivery is free.**
+
+Current Standard storage pricing is $0.015/GB-month before request charges, so the older "$5–10/TB" estimate in the research document should not be used for budgeting.
+
+---
+
+# 18. VIDEO PIPELINE
+
+Use [Mux](https://www.mux.com/docs/guides/stream-videos-in-4k?utm_source=chatgpt.com) as the baseline managed video platform.
+
+Pipeline:
+
+```text
+SOURCE VIDEO
+     │
+     ▼
+R2 MASTER ARCHIVE
+     │
+     ├───────────────┐
+     │               │
+     ▼               ▼
+MEDIA METADATA     MUX INGEST
+                     │
+                     ▼
+                  PROCESS
+                     │
+          ┌──────────┼───────────┐
+          ▼          ▼           ▼
+        HLS      THUMBNAILS   CAPTIONS
+          │          │           │
+          └──────────┼───────────┘
+                     ▼
+                 WEBHOOK
+                     │
+                     ▼
+                 POSTGRES
+                     │
+                     ▼
+            SAINTXVERSE PLAYER
+```
+
+Mux currently supports on-demand 4K/2160p when `max_resolution_tier: "2160p"` is configured. Its live output remains capped at 1080p even if higher-resolution input is accepted.
+
+Do not force 4K.
+
+Default:
+
+```text
+AUTO
+```
+
+Optional preference:
+
+```text
+Auto
+Data Saver
+720p
+1080p
+1440p
+2160p
+```
+
+The ABR system should choose the actual rendition.
+
+Mux supports resolution caps on playback URLs, while the default manifest allows the player to choose based on conditions.
+
+---
+
+# 19. VIDEO QUALITY POLICY
+
+SaintxVerse should classify content.
+
+```text
+CINEMATIC MASTER
+→ Mux Plus/Premium
+→ 4K where source merits it
+
+MUSIC VIDEO
+→ Plus/Premium
+→ up to 4K
+
+PROJECT DEMO
+→ Basic/Plus
+→ usually 1080p
+
+BACKGROUND MOTION
+→ aggressively compressed
+→ 720/1080p
+→ never consume 4K unnecessarily
+```
+
+"HQ" means intelligent fidelity.
+
+It does not mean maximum bitrate everywhere.
+
+Current Mux pricing varies materially by resolution and quality level, so cost models must be generated from actual projected input, storage and delivered minutes rather than hardcoded folklore.
+
+---
+
+# 20. SAINTXVERSE STUDIO PLAYER
+
+The Studio Player is one of the signature systems.
+
+Three modes:
+
+```text
+MINI PLAYER
+      ↓
+EXPANDED PLAYER
+      ↓
+CINEMATIC MODE
+```
+
+## Mini
+
+```text
+[art] TITLE — ARTIST     ━━━━━━━
+      ◀  ▶  ▶▶          volume
+```
+
+## Expanded
+
+Adds:
+
+```text
+queue
+waveform
+source
+quality
+lyrics
+credits
+related works
+```
+
+## Cinematic
+
+Adds:
+
+```text
+video
+artwork environment
+GPU visualizer
+spectrum
+lyrics/captions
+chapters
+immersive navigation
+```
+
+---
+
+# 21. PLAYER STATE MACHINE
+
+```text
+IDLE
+ │
+ ▼
+LOADING
+ │
+ ├── failure → ERROR
+ │
+ ▼
+READY
+ │
+ ├── play → PLAYING
+ │
+ └── seek → SEEKING
+        │
+        ▼
+PLAYING
+ │
+ ├── pause → PAUSED
+ ├── seek → SEEKING
+ ├── ended → NEXT
+ └── error → ERROR
+```
+
+Do not let React rerender 60 times per second because `currentTime` changed.
+
+High-frequency playback state should remain close to the media engine.
+
+UI state can update at controlled intervals.
+
+---
+
+# 22. PLAYER ADAPTER INTERFACE
+
+```ts
+interface PlaybackAdapter {
+  provider:
+    | 'saintxverse'
+    | 'spotify'
+    | 'youtube'
+    | 'soundcloud';
+
+  load(item: PlayableItem): Promise<void>;
+
+  play(): Promise<void>;
+  pause(): Promise<void>;
+
+  seek(seconds: number): Promise<void>;
+
+  setVolume(value: number): Promise<void>;
+
+  getState(): PlaybackSnapshot;
+
+  subscribe(
+    listener: (state: PlaybackSnapshot) => void
+  ): () => void;
+
+  destroy(): Promise<void> | void;
+}
+```
+
+The shell knows playback semantics.
+
+The adapter knows provider behavior.
+
+---
+
+# 23. NATIVE SAINTXVERSE MEDIA IS PRIMARY
+
+When rights permit:
+
+```text
+SaintxVerse Native
+        ↓
+premium playback
+        ↓
+audio intelligence
+        ↓
+visualization
+        ↓
+waveforms
+        ↓
+HQ/4K
+```
+
+External providers become distribution surfaces.
+
+```text
+Spotify
+YouTube
+SoundCloud
+```
+
+should complement the native experience rather than determine it.
+
+---
+
+# 24. SPOTIFY POLICY
+
+[Spotify Web Playback SDK](https://developer.spotify.com/documentation/web-playback-sdk?utm_source=chatgpt.com) can provide browser playback, but it should **not** be treated as a universally available SaintxVerse playback backend.
+
+Current official documentation says Web Playback requires a Spotify Premium access token and explicitly states that commercial streaming integrations require Spotify approval. Spotify also prohibits synchronizing Spotify recordings with visual media through its platform.
+
+Therefore:
+
+```text
+Spotify track
+     │
+     ├── metadata / attribution
+     ├── Open in Spotify
+     └── optional approved playback integration
+```
+
+Never:
+
+```text
+Spotify audio
+→ extract PCM
+→ run Saint visualizer
+→ rebroadcast
+```
+
+Also, Spotify Audio Features and Audio Analysis were removed from new Web API use cases in November 2024.
+
+Therefore SaintxVerse should compute its own analysis from Saint-owned masters.
+
+---
+
+# 25. YOUTUBE POLICY
+
+Use the official [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference?utm_source=chatgpt.com).
+
+Do not use:
+
+```text
+0×0 YouTube player
+hidden iframe
+player underneath custom artwork
+overlay covering YouTube controls
+audio extraction
+YouTube-as-CDN
+```
+
+YouTube currently requires embedded players to have a viewport of at least 200×200 pixels and explicitly prohibits overlays that obscure any part of the embedded player.
+
+Premium integration therefore means:
+
+```text
+SaintxVerse cinematic frame
+        │
+        └── visible compliant YouTube player
+```
+
+rather than disguising YouTube playback as native playback.
+
+---
+
+# 26. SOUNDCLOUD POLICY
+
+Use official [SoundCloud oEmbed](https://developers.soundcloud.com/docs/oembed?utm_source=chatgpt.com)/widget integration.
+
+SoundCloud's official oEmbed endpoint returns the provider's iframe player.
+
+Do not build architecture around scraping raw stream URLs.
+
+Use:
+
+```text
+native SaintxVerse player
+when SaintxVerse owns/hosts media
+
+SoundCloud widget
+when SoundCloud is source
+
+Open on SoundCloud
+as universal fallback
+```
+
+---
+
+# 27. AUDIO ARCHITECTURE
+
+Source archive:
+
+```text
+24-bit WAV
+or
+lossless FLAC
+```
+
+Delivery options may include:
+
+```text
+AAC
+Opus
+lossless where appropriate
+```
+
+Do not stream giant lossless files automatically.
+
+Network-aware selection matters.
+
+Pipeline:
+
+```text
+MASTER
+  │
+  ├── archive
+  │
+  ├── loudness analysis
+  ├── waveform
+  ├── spectral analysis
+  ├── BPM/key/onsets
+  │
+  └── delivery renditions
+```
+
+---
+
+# 28. AUDIO INTELLIGENCE
+
+Separate two problems.
+
+## Offline intelligence
+
+Precompute:
+
+```text
+duration
+BPM
+musical key
+LUFS
+true peak
+waveform peaks
+beat timestamps
+onset timestamps
+spectral centroid
+spectral rolloff
+dynamic range
+sections
+optional embeddings
+```
+
+Potential pipeline:
+
+```text
+FFmpeg
++
+native/server-side Essentia
++
+custom analysis workers
+```
+
+Persist results.
+
+## Real-time visualization
+
+Use Web Audio APIs for native playable media.
+
+```text
+MediaElementSource
+      │
+      ▼
+AnalyserNode
+      │
+      ├── waveform
+      ├── FFT
+      └── visualizer input
+      │
+      ▼
+Gain / destination
+```
+
+AudioWorklet is reserved for processing that actually needs audio-thread execution.
+
+A BPM calculator does not need a worker.
+
+---
+
+# 29. VISUALIZER ENGINE
+
+Three quality tiers:
+
+```text
+LOW
+Canvas / simple shader
+
+MEDIUM
+WebGL particle/spectrum system
+
+HIGH
+WebGL/WebGPU cinematic environment
+```
+
+Quality selection considers:
+
+```text
+device capability
+viewport
+frame rate
+save-data preference
+reduced motion
+tab visibility
+thermal/battery realities
+```
+
+Visualizations stop or reduce work when:
+
+```text
+document.hidden === true
+```
+
+No invisible 60fps GPU loops.
+
+---
+
+# 30. MEDIA SESSION
+
+Use browser Media Session APIs when supported for:
+
+```text
+title
+artist
+album
+artwork
+play
+pause
+seek
+next
+previous
+```
+
+Support must be feature-detected because parts of the Media Session API remain uneven across browsers.
+
+It is enhancement.
+
+It is not the player architecture itself.
+
+---
+
+# 31. SEARCH ARCHITECTURE
+
+Universal search:
+
+```text
+⌘K
+Ctrl+K
+```
+
+Searches:
+
+```text
+projects
+case studies
+experience
+skills
+people
+tracks
+releases
+videos
+artwork
+games
+tools
+experiments
+pages
+```
+
+Search is:
+
+```text
+identity-aware
+locale-aware
+publication-aware
+projection-aware
+```
+
+---
+
+# 32. SEARCH DOCUMENT MODEL
+
+Do not put one embedding directly on `entities`.
+
+Use versioned documents.
+
+```sql
+create table search_documents (
+  id uuid primary key default gen_random_uuid(),
+
+  entity_id uuid not null
+    references entities(id)
+    on delete cascade,
+
+  projection_id uuid
+    references entity_projections(id)
+    on delete cascade,
+
+  identity sx_identity not null,
+  locale text not null,
+
+  content text not null,
+
+  search_vector tsvector,
+
+  embedding_model text,
+  embedding_version text,
+
+  embedding vector,
+
+  publication publication_state not null,
+
+  indexed_at timestamptz
+);
+```
+
+If your installed pgvector/schema strategy requires fixed dimensions for indexed vector columns, create model-version-specific storage/indexing rather than pretending arbitrary dimensions can share one ANN index.
+
+The application owns an embedding registry:
+
+```text
+model
+provider
+dimensions
+version
+created_at
+active
+```
+
+Re-embedding becomes a migration process.
+
+---
+
+# 33. HYBRID RRF SEARCH
+
+Pipeline:
+
+```text
+QUERY
+ │
+ ├─────────────┐
+ ▼             ▼
+FTS         EMBEDDING
+ │             │
+ ▼             ▼
+TOP N         TOP N
+ │             │
+ └──────┬──────┘
+        ▼
+       RRF
+        │
+        ▼
+ exact boosts
+        │
+        ▼
+ permissions
+        │
+        ▼
+ results
+```
+
+Formula:
+
+\[
+RRF(d)=
+\frac{1}{k+r_{fts}(d)}
++
+\frac{1}{k+r_{vec}(d)}
+\]
+
+Start with:
+
+```text
+k = 60
+candidate pool = 50–100 per retriever
+```
+
+but tune from measured relevance.
+
+---
+
+# 34. EXACT MATCH BOOSTING
+
+"ASTRA PRIME" must not lose to a semantically related document.
+
+Add deterministic boosts before final ordering:
+
+```text
+exact normalized title
+exact slug
+exact alias
+prefix title
+acronym
+FTS
+semantic
+```
+
+Example:
+
+```text
+ASTRA PRIME
+
+exact title match
+→ extremely strong
+
+ASTRA
+→ strong prefix/alias
+
+"AI memory architecture"
+→ semantic relevance
+```
+
+---
+
+# 35. PGVECTOR INDEXING
+
+Use HNSW when the corpus grows enough to justify ANN.
+
+Current pgvector supports iterative scans to improve filtered HNSW/IVFFlat retrieval when post-index filtering would otherwise return too few rows.
+
+For SaintxVerse's likely early corpus, benchmark exact vector search first.
+
+Do not introduce ANN complexity because it sounds sophisticated.
+
+At small scale:
+
+```text
+exact vector search
++
+FTS
+```
+
+may already be extremely fast.
+
+---
+
+# 36. SEARCH SECURITY
+
+Search must never query unpublished content through the public endpoint.
+
+Pipeline must filter:
+
+```text
+publication = public
+OR intentionally permitted unlisted content
+```
+
+before exposure.
+
+Do not:
+
+```text
+embed secret notes
+index drafts
+send private vectors to browser
+expose service-role semantic search
+```
+
+Hidden route ≠ authorization.
+
+---
+
+# 37. COMMAND PALETTE
+
+The command palette is more than search.
+
+Commands:
+
+```text
+Switch to Karim
+Switch to Saint
+Light mode
+Dark mode
+Play latest release
+Open CV
+Open Arcade
+Open Lab
+Search projects
+Search music
+Mute
+Open queue
+Change language
+```
+
+Hidden commands may be registered through the Discovery Engine.
+
+---
+
+# 38. KARIM EXPERIENCE
+
+Karim homepage target:
+
+**under 30 seconds to comprehension.**
+
+Hero:
+
+```text
+Karim Al-Sharif
+
+Creative Technologist
+Media Specialist
+AI Systems Builder
+```
+
+Primary actions:
+
+```text
+View Projects
+View CV
+Contact
+```
+
+Then:
+
+```text
+Selected work
+Experience
+Capabilities
+Case studies
+Story
+Current direction
+```
+
+Avoid résumé dumping on the homepage.
+
+---
+
+# 39. NATIVE CV
+
+The CV must be structured HTML first.
+
+PDF is secondary.
+
+Database-backed sections:
+
+```text
+experience
+education
+skills
+certifications
+projects
+awards
+languages
+selected work
+```
+
+Benefits:
+
+```text
+SEO
+accessibility
+mobile usability
+automatic updates
+multiple projection formats
+print/PDF generation
+```
+
+---
+
+# 40. PROJECT CASE STUDY SYSTEM
+
+Each professional project supports:
+
+```text
+Summary
+Context
+Problem
+Role
+Constraints
+Approach
+Architecture
+Implementation
+Technology
+Results
+Lessons
+Media
+Related work
+```
+
+Readers may progressively reveal technical depth.
+
+Recruiters should not need to understand system architecture to understand the project's value.
+
+---
+
+# 41. SAINT HOMEPAGE
+
+Do not open with a card grid.
+
+Open with:
+
+```text
+CURRENT SIGNAL
+```
+
+One dominant current work.
+
+For example:
+
+```text
+ASCENSION
+
+[cinematic artwork]
+
+PLAY
+ENTER
+EXPLORE
+```
+
+Then:
+
+```text
+latest release
+cinema
+selected visuals
+arcade
+lab signal
+older transmissions
+```
+
+---
+
+# 42. MUSIC SYSTEM
+
+Hierarchy:
+
+```text
+ARTIST
+└── RELEASE
+    ├── TRACK
+    ├── TRACK
+    └── TRACK
+```
+
+Release page:
+
+```text
+artwork
+title
+release date
+type
+description/lore
+tracklist
+play
+credits
+lyrics
+production notes
+visuals
+provider links
+related videos
+related artwork
+related experiments
+```
+
+Track page:
+
+```text
+player
+waveform
+lyrics
+credits
+audio intelligence
+related video
+production notes
+providers
+```
+
+---
+
+# 43. CINEMA
+
+Video pages include:
+
+```text
+adaptive player
+poster
+title
+description
+chapters
+captions
+transcript
+credits
+stills
+production information
+related music
+related artwork
+related projects
+```
+
+Do not treat video as a modal afterthought.
+
+---
+
+# 44. VISUALS
+
+Support:
+
+```text
+cover art
+photography
+graphics
+posters
+3D
+motion stills
+identity systems
+generative work
+experiments
+```
+
+Gallery viewer:
+
+```text
+zoom
+keyboard navigation
+swipe
+metadata
+credits
+related work
+download where permitted
+```
+
+---
+
+# 45. ARCADE
+
+Three first-class games.
+
+## LUCID DRIFT
+
+```text
+neon endless drive
+rhythm influence
+survival
+score
+music synchronization
+```
+
+## SIGNAL//BREAK
+
+```text
+glitch puzzle
+repair corrupted audiovisual signals
+timing
+pattern recognition
+```
+
+## ASCENSION
+
+```text
+vertical atmospheric platformer
+Saint environments
+narrative fragments
+exploration
+```
+
+All three contribute to a Verse-level meta progression.
+
+---
+
+# 46. PHASER LIFECYCLE
+
+Load Phaser only when necessary.
+
+Phaser's own `Game.destroy(removeCanvas, noReturn)` is asynchronous: destruction is flagged for the next frame. Its documentation also states that `noReturn=true` frees core plugin memory when Phaser will not be used again on the page.
+
+Therefore the default lifecycle should be:
+
+```text
+create game
+↓
+attach Phaser listeners
+↓
+run
+↓
+remove custom listeners/workers/audio
+↓
+game.destroy(true, appropriateNoReturn)
+↓
+wait for destroy event where necessary
+↓
+release references
+```
+
+Do **not** make manual `WEBGL_lose_context` calls the default teardown strategy.
+
+Phaser should own its renderer lifecycle.
+
+Manual forced context loss is an escape hatch for diagnosed browser/resource problems, not normal cleanup.
+
+Also clean:
+
+```text
+workers
+AudioContexts
+AudioWorklets
+ResizeObservers
+MutationObservers
+timers
+window listeners
+document listeners
+custom sockets
+custom textures
+external caches
+```
+
+Lazy loading reduces initial cost.
+
+It does not mean "zero RAM impact."
+
+---
+
+# 47. LAB
+
+The Lab is SaintxVerse's experimental surface.
+
+Potential modules:
+
+```text
+Audio Visualizer
+Particle Universe
+Generative Artwork
+MIDI/Chord Generator
+Image Processor
+Physics Toys
+Procedural Typography
+WebGL Experiments
+Shader Studies
+Creative AI Experiments
+Spatial Audio Tests
+```
+
+Each experiment should have:
+
+```text
+description
+controls
+reset
+performance tier
+keyboard support
+mobile fallback
+reduced-effects fallback
+```
+
+---
+
+# 48. TOOLS
+
+Useful creative calculators:
+
+```text
+BPM ↔ milliseconds
+delay timing
+reverb timing
+note ↔ frequency
+semitone/pitch shift
+sample duration
+time stretch
+frame/timecode
+aspect ratio
+resolution
+storage estimation
+render time estimation
+bitrate/file size
+tempo subdivisions
+MIDI note conversion
+```
+
+These should load almost instantly.
+
+No worker is required for trivial arithmetic.
+
+---
+
+# 49. DISCOVERY ENGINE
+
+The Easter egg system is a proper subsystem.
+
+```text
+EVENT
+ ↓
+CONDITION
+ ↓
+REQUIREMENTS
+ ↓
+DISCOVERY
+ ↓
+EFFECT
+ ↓
+REWARD
+ ↓
+PERSISTENCE
+```
+
+Example:
+
+```json
+{
+  "id": "signal_003",
+  "trigger": {
+    "type": "hold",
+    "target": "identity-x",
+    "durationMs": 3330
+  },
+  "requirements": [
+    "glyph_001",
+    "glyph_002",
+    "signalbreak_complete"
+  ],
+  "effects": [
+    {
+      "type": "unlock_route",
+      "value": "/void"
+    }
+  ]
+}
+```
+
+---
+
+# 50. DISCOVERY IDEAS
+
+The engine can support:
+
+```text
+X hold
+keyboard sequences
+333 motifs
+hidden command palette commands
+console transmissions
+source comments
+art hotspots
+waveform clues
+track sequences
+arcade fragments
+timeline secrets
+Karim/Saint counterpart links
+temporary liminal mode
+playable 404
+terminal
+signals
+glyph collections
+QR codes
+release-season mutations
+special search phrases
+return-visit acknowledgement
+```
+
+These are content.
+
+Not random code hacks.
+
+---
+
+# 51. DISCOVERY PERSISTENCE
+
+Local progression:
+
+```text
+IndexedDB or localStorage
+```
+
+is acceptable for anonymous discovery state.
+
+Store:
+
+```text
+signal ID
+unlock ID
+timestamp
+version
+game achievements
+```
+
+Do not call it encrypted unless it actually has a meaningful key-management/security model.
+
+Anything delivered to the browser should be considered discoverable.
+
+---
+
+# 52. TERMINAL
+
+`/terminal` should be theatrical but safe.
+
+Commands:
+
+```text
+help
+whoami
+karim
+saint
+discography
+projects
+timeline
+play
+signal
+glyphs
+origin
+enter void
+clear
+```
+
+Terminal commands query a constrained public API.
+
+Never expose:
+
+```text
+raw SQL
+arbitrary semantic DB query
+draft content
+admin metadata
+server filesystem
+environment variables
+unreleased media
+```
+
+---
+
+# 53. CMS — SAINTXVERSE STUDIO
+
+Build a purpose-specific admin over the graph once content volume justifies it.
+
+Sections:
+
+```text
+Dashboard
+Entities
+Projects
+Experience
+Music
+Cinema
+Visuals
+Media
+People
+Credits
+Taxonomy
+Relationships
+Translations
+Search
+Discoveries
+Redirects
+SEO
+Feature Flags
+Analytics
+Settings
+Audit
+```
+
+---
+
+# 54. DUAL-PROJECTION EDITOR
+
+The signature CMS editor:
+
+```text
+CANONICAL ENTITY
+────────────────────────────
+
+KARIM                     SAINT
+────────────────────────────────────
+Title                     Title
+Summary                   Lore
+Body                      Body
+SEO                       SEO
+Featured                  Featured
+Media                     Media
+```
+
+Preview combinations:
+
+```text
+Karim Light EN
+Karim Dark EN
+Saint Dark EN
+Saint Light EN
+
+Karim Light AR
+Karim Dark AR
+Saint Dark AR
+Saint Light AR
+```
+
+Plus mobile/desktop.
+
+---
+
+# 55. PUBLICATION WORKFLOW
+
+```text
+DRAFT
+  ↓
+REVIEW
+  ↓
+SCHEDULED
+  ↓
+PUBLIC
+  ↓
+ARCHIVED
+```
+
+Separate:
+
+```text
+UNLISTED
+```
+
+for deliberately accessible but non-indexed experiences.
+
+Publication is not identity.
+
+Visibility is not identity.
+
+Authentication is not identity.
+
+---
+
+# 56. MEDIA INGEST WORKFLOW
+
+```text
+EDITOR
+  │
+  ▼
+REQUEST UPLOAD
+  │
+  ▼
+SIGNED UPLOAD URL
+  │
+  ▼
+R2
+  │
+  ▼
+INGEST JOB
+  │
+  ├── metadata extraction
+  ├── checksum
+  ├── image processing
+  ├── audio analysis
+  └── Mux submission if video
+       │
+       ▼
+WEBHOOK
+       │
+       ▼
+MEDIA READY
+       │
+       ▼
+EDITOR PREVIEW
+       │
+       ▼
+PUBLISH
+```
+
+Jobs must be idempotent.
+
+Webhooks must be signature-verified.
+
+---
+
+# 57. APPLICATION STRUCTURE
+
+Recommended repository:
+
+```text
+saintxverse/
+│
+├── apps/
+│   ├── web/
+│   └── studio/
+│
+├── packages/
+│   ├── ui/
+│   ├── tokens/
+│   ├── database/
+│   ├── domain/
+│   ├── search/
+│   ├── media/
+│   ├── player/
+│   ├── discovery/
+│   ├── analytics/
+│   ├── config/
+│   └── testing/
+│
+├── games/
+│   ├── lucid-drift/
+│   ├── signal-break/
+│   └── ascension/
+│
+├── workers/
+│   ├── media-analysis/
+│   ├── search-indexing/
+│   └── ingest/
+│
+└── infra/
+```
+
+A monorepo becomes valuable because the public site, Studio, games and background processing share domain contracts.
+
+---
+
+# 58. SERVER / CLIENT BOUNDARY
+
+Server by default:
+
+```text
+page rendering
+content queries
+SEO
+metadata
+project pages
+release pages
+CV
+search bootstrap
+authorization
+CMS data
+```
+
+Client only when necessary:
+
+```text
+identity switch
+theme preference
+command palette
+player
+visualizer
+games
+interactive tools
+discovery engine
+drag interactions
+browser APIs
+```
+
+Avoid putting `'use client'` at high layout levels.
+
+---
+
+# 59. API LAYER
+
+Public:
+
+```text
+GET /api/search
+GET /api/entities/:slug
+GET /api/releases/:slug
+GET /api/media/:id/playback
+POST /api/contact
+```
+
+Authenticated Studio:
+
+```text
+POST /api/studio/entities
+PATCH /api/studio/entities/:id
+POST /api/studio/uploads
+POST /api/studio/publish
+POST /api/studio/reindex
+POST /api/studio/discoveries/test
+```
+
+Webhook:
+
+```text
+POST /api/webhooks/mux
+```
+
+Every mutation:
+
+```text
+authenticate
+authorize
+validate
+execute
+audit
+```
+
+---
+
+# 60. VALIDATION
+
+Use runtime schemas at trust boundaries.
+
+Validate:
+
+```text
+API payloads
+CMS mutations
+webhooks
+environment variables
+search filters
+provider metadata
+upload metadata
+discovery definitions
+```
+
+TypeScript is not runtime validation.
+
+---
+
+# 61. SECURITY MODEL
+
+Threat boundaries:
+
+```text
+PUBLIC BROWSER
+      │
+      ▼
+PUBLIC APP
+      │
+      ▼
+SERVER API
+      │
+      ├── PostgreSQL
+      ├── R2
+      ├── Mux
+      └── Provider APIs
+
+ADMIN BROWSER
+      │
+      ▼
+STUDIO
+      │
+      ▼
+PRIVILEGED SERVER
+```
+
+The service-role database credential never enters browser code.
+
+---
+
+# 62. DATABASE SECURITY
+
+Use RLS for authenticated Studio operations where appropriate.
+
+Public access should ideally go through explicit views/functions exposing only safe data.
+
+Example conceptual policy:
+
+```sql
+create policy "public projections readable"
+on entity_projections
+for select
+using (
+  exists (
+    select 1
+    from entities e
+    where e.id = entity_id
+      and e.publication = 'public'
+  )
+);
+```
+
+Admin/service policies are separate.
+
+---
+
+# 63. WEB SECURITY
+
+Implement:
+
+```text
+Content-Security-Policy
+HSTS
+Referrer-Policy
+Permissions-Policy
+X-Content-Type-Options
+frame restrictions where appropriate
+secure cookies
+SameSite
+CSRF protection for authenticated mutations
+rate limiting
+input validation
+output encoding
+signed upload URLs
+signed private playback
+webhook signature validation
+```
+
+Provider iframe origins should be explicitly represented in CSP rather than opening broad wildcards.
+
+---
+
+# 64. CONTACT ABUSE PROTECTION
+
+Contact endpoint:
+
+```text
+rate limit
+honeypot
+server validation
+spam heuristics
+optional challenge after suspicious activity
+message size limits
+structured logging
+```
+
+Do not expose personal inbox credentials or direct mail API secrets.
+
+---
+
+# 65. ACCESSIBILITY STANDARD
+
+Target WCAG 2.2 AA.
+
+Required:
+
+```text
+semantic landmarks
+heading hierarchy
+skip links
+keyboard navigation
+visible focus
+focus restoration
+dialog focus trapping
+accessible menus
+labels
+descriptions
+error associations
+captions
+transcripts
+reduced motion
+contrast
+touch target sizing
+screen reader status
+RTL correctness
+```
+
+W3C specifically recommends reduced-motion handling for interaction-triggered animation.
+
+---
+
+# 66. MEDIA ACCESSIBILITY
+
+Video:
+
+```text
+captions
+transcript
+keyboard seek
+play/pause labels
+volume semantics
+fullscreen labels
+quality control labels
+chapter navigation
+```
+
+Audio:
+
+```text
+track title
+artist
+duration
+current time
+play state
+queue semantics
+lyrics where available
+transcript for spoken material
+```
+
+Visualizers must not be necessary to understand playback.
+
+---
+
+# 67. PHOTOSENSITIVITY
+
+Avoid:
+
+```text
+rapid high-contrast flashing
+full-screen strobing
+uncontrolled glitch loops
+fast luminance oscillation
+```
+
+A "Reduced Effects" setting can go beyond OS reduced-motion preferences.
+
+```text
+Full
+Reduced
+Minimal
+```
+
+Saint remains visually intentional in every tier.
+
+---
+
+# 68. PERFORMANCE TARGETS
+
+Production targets at p75:
+
+```text
+LCP ≤ 2.5 s
+INP ≤ 200 ms
+CLS ≤ 0.1
+```
+
+Internal stretch goals can be stricter.
+
+Critical routes:
+
+```text
+/
+karim
+karim/projects/*
+karim/cv
+saint
+saint/music/*
+saint/cinema/*
+```
+
+should remain fast without waiting for game or visualizer code.
+
+---
+
+# 69. JAVASCRIPT BUDGET
+
+The default portfolio route must not download:
+
+```text
+Phaser
+Three.js
+heavy audio analysis
+all provider SDKs
+full visualizer runtime
+admin libraries
+```
+
+Load by capability.
+
+```text
+game route → Phaser
+visualizer opened → visual runtime
+Spotify selected → Spotify SDK
+YouTube selected → iframe API
+```
+
+This is essential to maintaining the contrast between sophistication and performance.
+
+---
+
+# 70. MEDIA PERFORMANCE
+
+Images:
+
+```text
+responsive sizes
+AVIF/WebP where appropriate
+intrinsic dimensions
+blur/placeholder strategy
+CDN caching
+lazy loading below fold
+```
+
+Video:
+
+```text
+poster first
+player lazy initialization
+metadata preload
+ABR
+no 4K background videos
+```
+
+Audio:
+
+```text
+metadata preload
+controlled next-track prefetch
+waveform sidecar
+avoid downloading whole library
+```
+
+---
+
+# 71. SEO
+
+Every public entity can generate structured metadata.
+
+Potential schema.org types:
+
+```text
+Person
+CreativeWork
+MusicAlbum
+MusicRecording
+VideoObject
+VisualArtwork
+SoftwareApplication
+VideoGame
+Article
+WebSite
+BreadcrumbList
+```
+
+Implement:
+
+```text
+canonical URLs
+hreflang
+OpenGraph
+social cards
+structured data
+sitemaps
+robots
+redirect registry
+stable slugs
+```
+
+Unlisted/secret routes should normally be:
+
+```text
+noindex
+```
+
+---
+
+# 72. ANALYTICS
+
+Separate product analytics from operational telemetry.
+
+Product events:
+
+```text
+identity_changed
+theme_changed
+locale_changed
+search_opened
+search_performed
+search_result_selected
+
+project_viewed
+case_study_viewed
+cv_viewed
+contact_started
+contact_submitted
+
+media_started
+media_paused
+media_completed
+quality_changed
+provider_selected
+queue_changed
+
+game_started
+game_completed
+achievement_unlocked
+
+signal_discovered
+experience_unlocked
+```
+
+Do not record secret keystrokes indiscriminately.
+
+Discovery telemetry should record the resulting event, not spy on arbitrary typing.
+
+---
+
+# 73. OBSERVABILITY
+
+Use:
+
+[Sentry](https://sentry.io?utm_source=chatgpt.com) or equivalent for application errors,
+
+plus host logs, database monitoring and media QoE.
+
+Track:
+
+```text
+error rate
+API latency
+search latency
+DB latency
+webhook failures
+job backlog
+media startup time
+rebuffering
+player errors
+Core Web Vitals
+game crashes
+WebGL context loss
+```
+
+Alert on symptoms that affect users.
+
+---
+
+# 74. TESTING MATRIX
+
+Unit:
+
+```text
+domain logic
+search ranking
+calculators
+discovery conditions
+media utilities
+```
+
+Database:
+
+```text
+constraints
+RLS
+publication boundaries
+search functions
+migrations
+```
+
+Component:
+
+```text
+forms
+menus
+dialogs
+player controls
+identity switch
+```
+
+Accessibility:
+
+```text
+axe
+keyboard
+screen reader smoke tests
+reduced motion
+contrast
+RTL
+```
+
+E2E:
+
+```text
+Karim navigation
+Saint navigation
+identity transformation
+theme switching
+locale switching
+search
+native playback
+provider fallback
+contact
+CV
+CMS publish
+game lifecycle
+discoveries
+```
+
+Visual regression matrix:
+
+```text
+Karim Light EN
+Karim Dark EN
+Saint Light EN
+Saint Dark EN
+
+Karim Light AR
+Karim Dark AR
+Saint Light AR
+Saint Dark AR
+```
+
+at:
+
+```text
+mobile
+tablet
+desktop
+wide
+```
+
+---
+
+# 75. MEDIA TESTING
+
+Test:
+
+```text
+slow network
+offline transition
+HLS failure
+expired token
+missing caption
+unsupported codec
+4K display
+low-power phone
+background tab
+seek
+queue advance
+provider unavailable
+autoplay blocked
+Media Session unsupported
+```
+
+The player must degrade rather than collapse.
+
+---
+
+# 76. GAME LEAK TESTING
+
+Automated lifecycle test:
+
+```text
+open game
+play
+exit
+open portfolio
+repeat ×20
+```
+
+Measure:
+
+```text
+DOM canvases
+WebGL contexts
+listeners
+heap
+workers
+AudioContexts
+GPU process behavior
+```
+
+A successful destroy is demonstrated through measurement, not comments in code.
+
+---
+
+# 77. CI/CD
+
+Pull request pipeline:
+
+```text
+install
+↓
+typecheck
+↓
+lint
+↓
+unit tests
+↓
+database validation
+↓
+component tests
+↓
+build
+↓
+E2E smoke
+↓
+accessibility checks
+↓
+preview deployment
+```
+
+Main branch:
+
+```text
+migration validation
+production build
+deploy
+synthetic smoke
+health check
+```
+
+Production database migrations should be forward-compatible and independently deployable where practical.
+
+---
+
+# 78. ENVIRONMENTS
+
+```text
+LOCAL
+PREVIEW
+STAGING
+PRODUCTION
+```
+
+Separate:
+
+```text
+database
+storage buckets
+Mux environments/assets
+OAuth callbacks
+analytics
+secrets
+```
+
+Never test destructive media or database operations against production.
+
+---
+
+# 79. DEPLOYMENT TOPOLOGY
+
+Recommended baseline:
+
+```text
+                    USERS
+                      │
+                      ▼
+                 CLOUDFLARE
+                 DNS / EDGE
+                      │
+        ┌─────────────┴──────────────┐
+        │                            │
+        ▼                            ▼
+     VERCEL                       MEDIA
+   Next.js App                R2 + Mux CDN
+        │
+        ▼
+  Server Functions
+        │
+  ┌─────┼─────────┐
+  │     │         │
+  ▼     ▼         ▼
+POSTGRES R2       MUX
+SUPABASE
+```
+
+[Vercel](https://vercel.com?utm_source=chatgpt.com) is the default application host because it minimizes operational friction for the chosen Next.js architecture.
+
+That does not mean every workload belongs at the edge.
+
+Database-heavy or long-running analysis belongs in appropriate server/background infrastructure.
+
+---
+
+# 80. BACKGROUND JOBS
+
+Required job types:
+
+```text
+media ingestion
+image derivation
+audio analysis
+video registration
+search indexing
+embedding generation
+re-embedding
+scheduled publishing
+cache invalidation
+provider metadata refresh
+link validation
+```
+
+Each job requires:
+
+```text
+idempotency key
+status
+attempt count
+last error
+created time
+started time
+completed time
+```
+
+Failed jobs should move to an inspectable dead-letter state.
+
+---
+
+# 81. BACKUPS
+
+Postgres:
+
+```text
+managed backups
+PITR where plan permits
+periodic restore drills
+```
+
+R2:
+
+```text
+versioning/lifecycle strategy where appropriate
+master media retention
+checksums
+```
+
+Mux should not be the sole copy of original source video.
+
+The archival source belongs under SaintxVerse control.
+
+---
+
+# 82. FAILURE PHILOSOPHY
+
+Every sophisticated subsystem needs a simple fallback.
+
+```text
+View Transition unavailable
+→ immediate identity change
+
+WebGL unavailable
+→ static artwork
+
+visualizer disabled
+→ waveform
+
+Mux failure
+→ error state / alternative source
+
+Spotify unavailable
+→ Open in Spotify
+
+YouTube API failure
+→ direct YouTube destination
+
+semantic search failure
+→ keyword search
+
+game unsupported
+→ game information page
+
+JavaScript partially unavailable
+→ core Karim content remains readable
+```
+
+This is how the platform stays premium rather than fragile.
+
+---
+
+# 83. CORRECTIONS TO THE RESEARCH BLUEPRINT
+
+The supplied research is useful, but the following claims should not become implementation requirements without correction.
+
+### R2
+
+Correct:
+
+```text
+no R2 Internet egress bandwidth charge
+```
+
+Incorrect simplification:
+
+```text
+media delivery is free
+```
+
+Storage and operations remain billable.
+
+### Mux
+
+Correct:
+
+```text
+on-demand up to 4K
+```
+
+Not:
+
+```text
+every video should be forced to 4K
+```
+
+ABR remains default.
+
+### Spotify
+
+Do not assume Spotify is a transparent audio backend.
+
+Its Web Playback integration has account and policy constraints, and new applications cannot rely on Audio Features/Audio Analysis endpoints.
+
+### YouTube
+
+Never implement a hidden 0×0 player.
+
+Visible player requirements apply.
+
+### Phaser
+
+`destroy()` is asynchronous.
+
+Manual WebGL context loss should not be standard teardown.
+
+### CSS
+
+Token switching avoids duplicate React trees and unnecessary remounts.
+
+It does not eliminate style calculation, paint or compositing work.
+
+### Local persistence
+
+Do not describe local discovery state as secure encryption.
+
+Anything sent to a public browser is potentially inspectable.
+
+### Search
+
+Do not permanently couple the canonical entity model to `vector(1536)`.
+
+Embeddings need explicit model/version lifecycle management.
+
+---
+
+# 84. WHAT NOT TO BUILD IN V1
+
+Do not start with:
+
+```text
+AI chat over the entire Verse
+WebGPU-only visualizer
+multiplayer games
+account system for visitors
+blockchain collectibles
+custom video transcoding infrastructure
+native mobile app
+complex recommendation ML
+every possible CMS automation
+DRM for public music videos
+```
+
+Build the foundation that makes those possible later.
+
+---
+
+# 85. IMPLEMENTATION ORDER
+
+## Phase 0 — Architecture
+
+Deliver:
+
+```text
+domain vocabulary
+ERD
+route map
+design tokens
+security boundaries
+repo structure
+environment strategy
+```
+
+Exit criterion:
+
+**the team can explain where every major piece of data belongs.**
+
+---
+
+## Phase 1 — Canonical Graph
+
+Build:
+
+```text
+entities
+projections
+localizations
+relations
+people
+credits
+taxonomy
+media
+publication
+audit
+```
+
+Then seed real content.
+
+Do not design against dummy lorem ipsum alone.
+
+---
+
+## Phase 2 — State Kernel
+
+Build:
+
+```text
+identity
+appearance
+locale
+reduced effects
+persistence
+SSR initialization
+```
+
+Eliminate theme/identity flash before adding cinematic transitions.
+
+---
+
+## Phase 3 — Design System
+
+Build:
+
+```text
+tokens
+typography
+surfaces
+layout
+forms
+navigation
+dialogs
+search UI
+media primitives
+RTL
+accessibility
+```
+
+Storybook or equivalent component documentation is useful here.
+
+---
+
+## Phase 4 — Application Shell
+
+Build:
+
+```text
+X gateway
+navigation
+identity switch
+theme
+locale
+command palette
+search shell
+404
+error states
+responsive shell
+```
+
+At this point SaintxVerse should already feel like one coherent operating system.
+
+---
+
+## Phase 5 — Karim
+
+Ship:
+
+```text
+Home
+About
+Experience
+Projects
+Case Studies
+CV
+Story
+Contact
+```
+
+This creates an immediately useful professional site.
+
+---
+
+## Phase 6 — Saint Content
+
+Ship:
+
+```text
+Saint Home
+Music
+Cinema
+Visuals
+About
+```
+
+Without games or giant effects initially.
+
+Prove the content architecture first.
+
+---
+
+## Phase 7 — Media Runtime
+
+Build:
+
+```text
+R2 ingest
+Mux ingest
+webhooks
+native audio
+native video
+Studio Player
+queue
+waveforms
+captions
+quality
+Media Session
+provider links/adapters
+```
+
+---
+
+## Phase 8 — Audio Intelligence
+
+Build:
+
+```text
+waveform pipeline
+LUFS
+BPM
+key
+beat/onset map
+spectrum
+visualizer
+quality tiers
+```
+
+---
+
+## Phase 9 — Lab & Tools
+
+Ship calculators first.
+
+Then progressively add GPU experiments.
+
+---
+
+## Phase 10 — Arcade
+
+Build each game as its own isolated runtime.
+
+Order:
+
+```text
+SIGNAL//BREAK
+LUCID DRIFT
+ASCENSION
+```
+
+or choose based on production complexity after prototyping.
+
+---
+
+## Phase 11 — Discovery Engine
+
+Only after the normal site is excellent.
+
+Add:
+
+```text
+signals
+glyphs
+terminal
+333
+hidden routes
+arcade meta-game
+cross-identity secrets
+```
+
+Public simplicity first.
+
+Hidden depth second.
+
+---
+
+## Phase 12 — Intelligence
+
+Then add:
+
+```text
+semantic search
+natural-language Verse exploration
+related-work recommendations
+cross-project discovery
+optional conversational interface
+```
+
+The intelligence layer consumes the graph.
+
+It should not compensate for an undefined graph.
+
+---
+
+# 86. RELEASE LEVELS
+
+## MVP
+
+```text
+canonical graph
+Karim site
+basic Saint site
+identity/theme/localization
+native images
+basic audio
+CMS basics
+SEO
+accessibility
+analytics
+```
+
+## V1
+
+```text
+Studio Player
+Mux video
+R2 media pipeline
+Music/Cinema
+hybrid search
+full CV
+case studies
+EN/AR
+visual galleries
+```
+
+## V1.5
+
+```text
+audio intelligence
+visualizer
+Lab
+Tools
+Arcade
+discovery engine
+terminal
+advanced CMS
+```
+
+## V2+
+
+```text
+conversational Verse
+advanced graph navigation
+adaptive recommendations
+release-specific worlds
+physical QR experiences
+advanced spatial graphics
+optional accounts/cloud progression
+```
+
+---
+
+# 87. DEFINITION OF DONE
+
+A feature is not complete because it works on the developer's laptop.
+
+Done means:
+
+```text
+functional
+typed
+validated
+tested
+accessible
+responsive
+RTL reviewed
+dark/light reviewed
+Karim/Saint reviewed
+instrumented
+secure
+documented
+failure states handled
+performance checked
+```
+
+For media:
+
+```text
+slow network tested
+mobile tested
+keyboard tested
+captions tested
+provider failure tested
+```
+
+For games:
+
+```text
+mount/unmount tested repeatedly
+memory inspected
+mobile behavior tested
+reduced effects considered
+```
+
+---
+
+# 88. FINAL SYSTEM MODEL
+
+```text
+                         SAINTXVERSE
+                              │
+                              X
+                 ┌────────────┴────────────┐
+                 │                         │
+               KARIM                     SAINT
+                 │                         │
+       professional projection      artistic projection
+                 │                         │
+                 └────────────┬────────────┘
+                              │
+                     CANONICAL GRAPH
+                              │
+       ┌──────────┬───────────┼───────────┬───────────┐
+       │          │           │           │           │
+       ▼          ▼           ▼           ▼           ▼
+    CONTENT     MEDIA      RELATIONS    SEARCH    DISCOVERY
+       │          │           │           │           │
+       │       ┌──┴──┐        │        FTS+VECTOR      │
+       │       │     │        │           │           │
+       │      R2    MUX       GRAPH        RRF       SIGNALS
+       │       │     │        │           │           │
+       │       └──┬──┘        │           │           │
+       │          │           │           │           │
+       └──────────┴───────────┴───────────┴───────────┘
+                              │
+                       EXPERIENCE LAYER
+                              │
+       ┌──────────┬───────────┼──────────┬────────────┐
+       │          │           │          │            │
+       ▼          ▼           ▼          ▼            ▼
+     WEB       PLAYER       ARCADE      LAB        STUDIO
+```
+
+---
+
+# 89. THE EXPERIENCE STANDARD
+
+The final site should satisfy three different depths of engagement.
+
+### Thirty seconds
+
+A recruiter understands:
+
+```text
+who Karim is
+what he does
+what he has built
+how to contact him
+```
+
+### Thirty minutes
+
+A listener understands:
+
+```text
+who Saint Lucid is
+what the music sounds like
+what the visual universe means
+what else exists in the Verse
+```
+
+### Three months
+
+A curious visitor may still discover:
+
+```text
+signals
+connections
+hidden artwork
+game fragments
+terminal commands
+cross-project relationships
+release lore
+new mutations
+```
+
+That is the SaintxVerse difference.
+
+The complexity lives underneath.
+
+The surface remains intentional.
+
+---
+
+# 90. FINAL PRODUCT PRINCIPLE
+
+SaintxVerse should not demonstrate sophistication by visibly exposing every technology it uses.
+
+It should demonstrate sophistication through:
+
+```text
+speed
+clarity
+coherence
+media quality
+attention to detail
+accessibility
+continuity
+depth
+reliability
+surprise
+```
+
+Karim gets the visitor oriented.
+
+Saint Lucid pulls the visitor deeper.
+
+The X connects them.
+
+The graph makes the connection technically real.
+
+The Studio Player makes the media feel native.
+
+The Arcade and Lab make the universe interactive.
+
+The Discovery Engine makes it persistent.
+
+And the canonical architecture ensures all of those systems describe the same underlying world rather than becoming disconnected portfolio features.
+
+**SaintxVerse is therefore best understood as a graph-backed personal media operating system with two identity projections and an expandable experiential layer.**
+
+That should remain the architectural north star.
